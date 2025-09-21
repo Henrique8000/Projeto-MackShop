@@ -205,7 +205,7 @@ public class MackShop {
 	
 	
 	public static int[] preencheEstoquesProdutos(int[] estoquesProdutos) {
-			return estoquesProdutos = new int[] {0, 5, 10, 15, 8};
+			return estoquesProdutos = new int[] {1, 5, 10, 15, 8};
 	}
 	
 	
@@ -240,17 +240,40 @@ public class MackShop {
 // ##########################################################################################################################	
 
 	public static void exibirCatalogoProdutos(String[] nomesProdutos, int[] estoquesProdutos) {
-		int qtdProduto = 0;
-		
-		System.out.println("\n==========CATÁLOGO DE PROUDTOS DISPONÍVEIS EM ESTOQUE==========");
-		for (int i=0; i<estoquesProdutos.length; i++) {
-			
-			if (estoquesProdutos[i] > 0) {
-				
-				qtdProduto = estoquesProdutos[i];
-				System.out.println(nomesProdutos[i]);
-			}
-		}
-		System.out.println("============================================================\n");
+	    int n = nomesProdutos.length;
+	    int[] indice = new int[n];
+	    int k = 0;
+
+	    for (int i = 0; i < n; i++) {
+	        if (estoquesProdutos[i] > 0) {
+	            indice[k++] = i;
+	        }
+	    }
+
+	    for (int i = 0; i < k - 1; i++) {
+	        int maior = i;
+	        for (int j = i+1; j < k; j++) {
+	            if (estoquesProdutos[indice[j]] > estoquesProdutos[indice[maior]]) {
+	                maior = j;
+	            }
+	        }
+	        int tmp = indice[i];
+	        indice[i] = indice[maior];
+	        indice[maior] = tmp;
+	    }
+
+	    System.out.println("\n========== CATÁLOGO DE PRODUTOS (ORDENADO POR ESTOQUE) ==========");
+	    if (k == 0) {
+	        System.out.println("(nenhum produto disponível em estoque)");
+	    } else {
+	        System.out.printf("%-4s  %-30s  %s%n", "#", "Produto", "Qtd.");
+	        System.out.println("------------------------------------------------------");
+	        for (int p = 0; p < k; p++) {
+	            int i = indice[p];
+	            System.out.printf("%-4d  %-30s  %d%n", (p + 1), nomesProdutos[i], estoquesProdutos[i]);
+	        }
+	    }
+	    System.out.println("================================================================\n");
 	}
+
 }
