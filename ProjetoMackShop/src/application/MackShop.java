@@ -97,34 +97,15 @@ public class MackShop {
 						
 						exibeAdicionarItemVenda();
 						
-						int[] vect = new int[2];
-						
 						System.out.print("Digite o ID do item que vc deseja comprar: ");
 						int countId = 0;
 						
 						int idItem = sc.nextInt();
 						
+						idItem = velidaçõesDeEntradaDoId(idsProdutos, idItem, estoquesProdutos, sc, countId);
 						
-						
-						//TODO: Validação se para aql produto ainda tem uma qtd > que 0
-							
-						while (idItem < 1 || idItem > 5) {
-							System.out.println("\n=====================\n");
-							System.out.println("Insira um id válido!");
-							System.out.println("\n=====================");
-							
-							System.out.print("-> ");
-							idItem = sc.nextInt();
-							
-							for (int j=0; j<idsProdutos.length; j++) {
-								if (idItem == idsProdutos[j]) countId += 1;	
-							}
-						}
-					
 						System.out.print("\nQuantos vc quer levar? ");
 						int qtdItens = sc.nextInt();
-						
-						//TODO: Validação se é um numero inteiro do campo qtdItens 
 						
 						//TODO: Validação se a quantidade que o cliente quer levar condiz com oq tem em estoque 
 						while (qtdItens > estoquesProdutos[idItem - 1] || qtdItens <= 0) {
@@ -142,7 +123,7 @@ public class MackShop {
 							if (idsProdutos[i] == idItem && estoquesProdutos[i] > 0) {
 								vendaAtualIds[i] = idItem;
 								vendaAtualQuantidades[i] = qtdItens;
-								estoquesProdutos[i] -= qtdItens;
+								//estoquesProdutos[i] -= qtdItens;
 							}						
 						}
 						
@@ -203,7 +184,10 @@ public class MackShop {
 							}
 						}
 						
-						//TODO: Debita do estoque?
+						for (int i=0; i<vendaAtualQuantidades.length; i++) {
+							if (vendaAtualQuantidades[i] != 0) estoquesProdutos[i] -= vendaAtualQuantidades[i];	
+						}
+						
 
 						imprimirNotaFiscal(idPedidos, totalVendaAtual, idsProdutos, vendaAtualQuantidades, idsProdutos, nomesProdutos, precosProdutos, sc);
 						
@@ -254,7 +238,7 @@ public class MackShop {
 				case "8":
 					
 					if (condBaseIniciada == true) {
-						exibeMsgBaseNaoInicializada();
+						
 
 					}
 					
@@ -373,7 +357,7 @@ public class MackShop {
 // ##########################################################################################################################
 
 
-// FUNÇÕES PARA INICIALIZAR A BASE E VERIFICAR SE A BASE FOI INICIALIZADA
+// 1 - FUNÇÕES PARA INICIALIZAR A BASE E VERIFICAR SE A BASE FOI INICIALIZADA
 	
 	public static boolean verificaBaseInicializada(boolean base) {
 		if (!base) {
@@ -437,7 +421,9 @@ public class MackShop {
 	
 
 // ##########################################################################################################################
-// ##########################################################################################################################	
+// ##########################################################################################################################
+	
+// 2 - FUNÇÃO PARA EXIBIR CATÁLOGO DE PRODUTOS
 
 	public static void exibirCatalogoProdutos(String[] nomesProdutos, int[] estoquesProdutos) {
 	    int n = nomesProdutos.length;
@@ -480,6 +466,55 @@ public class MackShop {
 // ##########################################################################################################################
 // ##########################################################################################################################
 	
+// 3 - FUNÇÕES PARA ADICIONAR ITEM À VENDA
+
+	public static int verificaSeIdExiste(int idItem, Scanner sc, int[] idsProdutos, int countId) {
+		
+		while (idItem < 1 || idItem > 5) {
+			System.out.println("\n=====================================\n");
+			System.out.println("Insira um id de um produto existente!");
+			System.out.println("\n=====================================");
+			
+			System.out.print("-> ");
+			idItem = sc.nextInt();
+			
+			for (int j=0; j<idsProdutos.length; j++) {
+				if (idItem == idsProdutos[j]) countId += 1;	
+			}
+		}
+		return idItem;
+	}
+	
+	public static int verificaSeTemOProdutoNoEstoque(int[] idsProdutos, int idItem, int[] estoquesProdutos, Scanner sc) {
+		for (int i=0; i<idsProdutos.length; i++) {
+			if (idsProdutos[idItem-1] == idItem) {
+				while (estoquesProdutos[idItem-1] <= 0) {
+					
+					System.out.println("\n=======================================================\n");
+					System.out.println("ATENÇÃO! O produto escolhido está em falta no estoque :(");
+					System.out.println("\n=======================================================\n");
+						
+					System.out.print("Insira o id de outro produto -> ");
+					idItem = sc.nextInt();
+						
+				}
+			}
+		}
+		
+		return idItem;
+	}
+	
+	public static int velidaçõesDeEntradaDoId(int[] idsProdutos, int idItem, int[] estoquesProdutos, Scanner sc, int countId) {
+		idItem = verificaSeIdExiste(idItem, sc, idsProdutos, countId);
+		idItem = verificaSeTemOProdutoNoEstoque(idsProdutos, idItem, estoquesProdutos, sc);
+		return idItem;
+	}
+	
+// ##########################################################################################################################
+// ##########################################################################################################################
+
+// 4 - FUNÇÃO PARA VER RESUMO TOTAL DA VENDA
+	
 	public static double verResumoTotalDaVenda(double totalVendaAtual,Scanner sc, int[] vendaAtualIds, int[] vendaAtualQuantidades, double[] precosProdutos, String[] nomesProdutos) {
 		totalVendaAtual = 0.0;
 		double subtotal = 0.0;
@@ -508,6 +543,12 @@ public class MackShop {
 		
 	}
 
+	
+// ##########################################################################################################################
+// ##########################################################################################################################
+	
+// 5 - FUNÇÕES PARA FINALIZAR VENDA
+	
 	public static void imprimirNotaFiscal(int idPedidos, double totalVendaAtual, int[] idsProdutos, int[] vendaAtualQuantidades, int[] vendaAtualIds, String[] nomesProdutos, double[] precosProdutos, Scanner sc) {
 	    LocalDateTime agora = LocalDateTime.now();
 	    DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
@@ -541,10 +582,9 @@ public class MackShop {
 		            String nomeProduto = nomesProdutos[indiceProduto];
 		            double precoUnitario = precosProdutos[indiceProduto];
 		            double valorTotalItem = precoUnitario * quantidadeNota;
-		            subtotalNota += valorTotalItem;
+		            subtotalNota = valorTotalItem;
 		            //TODO: não está imprimindo os produtos
-		            System.out.printf("* %-1d | %-3d | %-26s | %-3d | R$ %-7.2f | R$ %-7.2f *\n", 
-		                              (i + 1), idProdutoNota, nomeProduto, quantidadeNota, precoUnitario, valorTotalItem);
+		            System.out.printf("* %-1d | %-3d | %-26s | %-3d | R$ %-7.2f | R$ %-7.2f *\n", (i + 1), idProdutoNota, nomeProduto, quantidadeNota, precoUnitario, valorTotalItem);
 		        	}
 		        
 		        }
@@ -641,5 +681,54 @@ public class MackShop {
 
 		
 	}
-
+	
+	public static void buscarVendaEspecifica(Scanner sc, int[][] historicoItensVendidos, int[] idsProdutos, String[] nomesProdutos, double[] precosProdutos, double[] historicoValoresPedidos, int[] historicoIdsPedidos, int[] vendaAtualQuantidades, int idPedidos, double totalVendaAtual) {
+		System.out.print("\nDigite o ID do pedido que deseja buscar: ");
+		int idBusca = sc.nextInt();
+		sc.nextLine();
+	    
+	    // Verifica se o ID existe
+	    boolean existePedido = false;
+	    int indiceHistorico = -1;
+	    for (int i = 0; i < historicoIdsPedidos.length; i++) {
+	        if (historicoIdsPedidos[i] == idBusca) {
+	            existePedido = true;
+	            indiceHistorico = i;
+	            break;
+	        }
+	    }
+	    
+	    if (!existePedido) {
+	        System.out.println("\nPedido não encontrado no histórico!");
+	        return;
+	    }
+	    
+	    // Contar itens do pedido
+	    int numItensPedido = 0;
+	    for (int i = 0; i < historicoItensVendidos.length; i++) {
+	        if (historicoItensVendidos[i][0] == idBusca) {
+	            numItensPedido++;
+	        }
+	    }
+	    
+	    if (numItensPedido == 0) {
+	        System.out.println("\nNenhum item registrado para este pedido!");
+	        return;
+	    }
+	    
+	    int[] vendaIds = new int[numItensPedido];
+	    int[] vendaQuantidades = new int[numItensPedido];
+	    
+	    int contador = 0;
+	    for (int i = 0; i < historicoItensVendidos.length; i++) {
+	        if (historicoItensVendidos[i][0] == idBusca) {
+	            vendaIds[contador] = historicoItensVendidos[i][1];      
+	            vendaQuantidades[contador] = historicoItensVendidos[i][2]; 
+	            contador++;
+	        }
+	    }
+	    
+	    // Imprime a nota fiscal do pedido
+	    imprimirNotaFiscal(idPedidos, totalVendaAtual, idsProdutos, vendaAtualQuantidades, idsProdutos, nomesProdutos, precosProdutos, sc);
+	}
 }
