@@ -13,7 +13,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Scanner;
 
-public class MackShop2Supremo {
+public class MackShop {
 
 	public static void main(String[] args) {
 		Locale.setDefault(Locale.US);
@@ -698,4 +698,5 @@ String banner = "~=~=~=~=~=~=~=~=~=~=~=~=~=\n" +
 	    System.out.println();
 	}
 }
+
 
