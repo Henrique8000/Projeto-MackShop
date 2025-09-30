@@ -5,7 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Scanner;
 
-public class MackShop {
+public class GptVersion {
 
     public static void main(String[] args) {
         Locale.setDefault(Locale.US);
@@ -41,7 +41,8 @@ public class MackShop {
 
             switch (opcao) {
                 case "1": 
-                    if (condBaseIniciada = false) {
+                    if (condBaseIniciada == false) {
+                    	
                     	idsProdutos = inicializarIdsProdutos();
                         nomesProdutos = inicializarNomesProdutos();
                         precosProdutos = inicializarPrecosProdutos();
@@ -59,19 +60,22 @@ public class MackShop {
                         
                         exibirMensagemBaseInicializada();
                         pausaParaRetornarMenu(sc);
+                        break;
                        
-                    } else {
+                    } 
+                    else {
                     	 exibirMensagemBaseJaInicializada();
+                    	 break;
                     }
-                    break;
 
                 case "2":
                 	
                     if (condBaseIniciada == true) {
-                        exibirCatalogoOrdenadoPorEstoque(idsProdutos, nomesProdutos, estoquesProdutos);
+                    	exibirCatalogoProdutos(nomesProdutos, estoquesProdutos, tempEstoquesProdutos);
                         pausaParaRetornarMenu(sc);
                     }
                     else {
+                    	
                     	exibeMsgBaseNaoInicializada();
                         break;
                     }
@@ -154,6 +158,7 @@ public class MackShop {
                     if (condBaseIniciada == true) {
                         buscarEReimprimirVenda(sc, historicoItensVendidos, historicoIdsPedidos, historicoValoresPedidos, idsProdutos, nomesProdutos, precosProdutos);
                         pausaParaRetornarMenu(sc);
+                        break;
                     } 
                     else {
                     	exibeMsgBaseNaoInicializada();
@@ -165,6 +170,7 @@ public class MackShop {
                         reporEstoque(sc, idsProdutos, nomesProdutos, estoquesProdutos);
                         copiarConteudo(estoquesProdutos, tempEstoquesProdutos);
                         pausaParaRetornarMenu(sc);
+                        break;
                     } 
                     else {
                     	exibeMsgBaseNaoInicializada();
@@ -176,6 +182,7 @@ public class MackShop {
                     if (condBaseIniciada == true) {
                         emitirRelatorioEstoqueBaixo(idsProdutos, nomesProdutos, estoquesProdutos, 10);
                         pausaParaRetornarMenu(sc);
+                        break;
                     } 
                     else {
                     	exibeMsgBaseNaoInicializada();
@@ -258,6 +265,12 @@ public class MackShop {
         System.out.println();
     }
     
+    public static void exibeAdicionarItemVenda() {
+		System.out.println("\n++++++++++++++++++++++\n");
+		System.out.println("ADICIONAR ITEM A VENDA");
+		System.out.println("\n++++++++++++++++++++++\n");
+	}
+    
 // ##########################################################################################################################
 // ##########################################################################################################################
 
@@ -303,42 +316,43 @@ public class MackShop {
 // ##########################################################################################################################
 
 // 2 - FUNÇÃO PARA EXIBIR CATÁLOGO DE PRODUTOS
-    public static void exibirCatalogoOrdenadoPorEstoque(int[] idsProdutos, String[] nomesProdutos, int[] estoquesProdutos) {
-        int n = nomesProdutos.length;
-        int[] indices = new int[n];
-        int k = 0;
-        for (int i = 0; i < n; i++) {
-            if (estoquesProdutos[i] > 0) {
-                indices[k] = i;
-                k = k + 1;
-            }
-        }
-        // selection sort nos k primeiros índices (algo simples, não avançado)
-        for (int i = 0; i < k - 1; i++) {
-            int maior = i;
-            for (int j = i + 1; j < k; j++) {
-                if (estoquesProdutos[indices[j]] > estoquesProdutos[indices[maior]]) {
-                    maior = j;
-                }
-            }
-            int tmp = indices[i];
-            indices[i] = indices[maior];
-            indices[maior] = tmp;
-        }
+    public static void exibirCatalogoProdutos(String[] nomesProdutos, int[] estoquesProdutos, int[] tempEstoquesProdutos) {
+	    int n = nomesProdutos.length;
+	    int[] indice = new int[n];
+	    int k = 0;
 
-        System.out.println("\n========== CATÁLOGO DE PRODUTOS (ESTOQUE > 0) ==========");
-        if (k == 0) {
-            System.out.println("(nenhum produto disponível em estoque)");
-        } else {
-            System.out.printf("%-4s  %-6s  %-30s  %-10s%n", "#", "ID", "Produto", "Qtd.");
-            System.out.println("---------------------------------------------------------------");
-            for (int p = 0; p < k; p++) {
-                int i = indices[p];
-                System.out.printf("%-4d  %-6d  %-30s  %-10d%n", (p + 1), idsProdutos[i], nomesProdutos[i], estoquesProdutos[i]);
-            }
-        }
-        System.out.println("===============================================================\n");
-    }
+	    for (int i = 0; i < n; i++) {
+	        if (estoquesProdutos[i] > 0) {
+	            indice[k++] = i;
+	        }
+	    }
+
+	    for (int i = 0; i < k - 1; i++) {
+	        int maior = i;
+	        for (int j = i+1; j < k; j++) {
+	            if (estoquesProdutos[indice[j]] > estoquesProdutos[indice[maior]]) {
+	                maior = j;
+	            }
+	        }
+	        
+	        int tmp = indice[i];
+	        indice[i] = indice[maior];
+	        indice[maior] = tmp;
+	    }
+
+	    System.out.println("\n========== CATÁLOGO DE PRODUTOS (ORDENADO POR ESTOQUE) ==========");
+	    if (k == 0) {
+	        System.out.println("(nenhum produto disponível em estoque)");
+	    } else {
+	        System.out.printf("%-4s  %-30s  %s%n", "#", "Produto", "Qtd.");
+	        System.out.println("------------------------------------------------------");
+	        for (int p = 0; p < k; p++) {
+	            int i = indice[p];
+	            System.out.printf("%-4d  %-30s  %d%n", (p + 1), nomesProdutos[i], estoquesProdutos[i]);
+	        }
+	    }
+	    System.out.println("================================================================\n");
+	}
 
     
 // ##########################################################################################################################
@@ -346,51 +360,84 @@ public class MackShop {
     
 // 3 - FUNÇÕES PARA ADICIONAR ITEM À VENDA
     
-    public static void adicionarItemAVenda(Scanner sc, int[] idsProdutos, String[] nomesProdutos, double[] precosProdutos, int[] estoqueTempParaVenda, int[] vendaAtualIds, int[] vendaAtualQuantidades) {
+    public static void adicionarItemAVenda(Scanner sc, int[] idsProdutos, String[] nomesProdutos, double[] precosProdutos, int[] tempEstoquesProdutos, int[] vendaAtualIds, int[] vendaAtualQuantidades) {
         
-    	System.out.println("\n++++++++++++++++++++++\nADICIONAR ITEM À VENDA\n++++++++++++++++++++++\n");
+    	exibeAdicionarItemVenda();
 
-        System.out.print("Digite o ID do produto: ");
-        int idInformado = sc.nextInt();
-        sc.nextLine();
-        int indiceProduto = indiceDoProduto(idsProdutos, idInformado);
-
-        System.out.printf("\nQuantidade de '%s' disponível agora: %d\n",
-                nomesProdutos[indiceProduto], estoqueTempParaVenda[indiceProduto]);
-
-        System.out.print("Quantos você quer levar? ");
-        int qtd = sc.nextInt();
-        sc.nextLine();
-        
-        vendaAtualIds[indiceProduto] = idInformado;
-        vendaAtualQuantidades[indiceProduto] = vendaAtualQuantidades[indiceProduto] + qtd;
-        estoqueTempParaVenda[indiceProduto] = estoqueTempParaVenda[indiceProduto] - qtd;
-
-        System.out.printf("\nAdicionado: %d x %s\n", qtd, nomesProdutos[indiceProduto]);
+    	System.out.print("Digite o ID do item que vc deseja comprar: ");
+		int countId = 0;
+		
+		int idItem = sc.nextInt();
+		
+		idItem = velidaçõesDeEntradaDoId(idsProdutos, idItem, tempEstoquesProdutos, sc, countId);
+		
+		System.out.print("\nQuantos vc quer levar? ");
+		int qtdItens = sc.nextInt();
+		
+		//TODO: Validação se a quantidade que o cliente quer levar condiz com oq tem em estoque
+		while (qtdItens > tempEstoquesProdutos[idItem - 1] || qtdItens <= 0) {
+			
+			System.out.println("\n=============================\n");
+			System.out.println("Insira uma quantidade válida!");
+			System.out.println("\n=============================");
+			
+			System.out.print("-> ");
+			qtdItens = sc.nextInt();
+		}
+		
+		for (int i=0; i<idsProdutos.length; i++) {
+			
+			if (idsProdutos[i] == idItem && tempEstoquesProdutos[i] > 0) {
+				vendaAtualIds[i] = idItem;
+				vendaAtualQuantidades[i] = qtdItens;
+				tempEstoquesProdutos[i] -= qtdItens;
+			}						
+		}
     }
-
-    public static int lerIdValido(Scanner sc, int[] idsProdutos) {
-        System.out.print("Digite o ID do produto: ");
-        while (true) {
-            int id = sc.nextInt();
-            sc.nextLine();
-            if (indiceDoProduto(idsProdutos, id) != -1) {
-                return id;
-            }
-            System.out.print("Produto não existe. Digite novamente: ");
-        }
-    }
-
-    public static int lerQuantidadeValida(Scanner sc, int maxDisponivel) {
-        while (true) {
-            int qtd = sc.nextInt();
-            sc.nextLine();
-            if (qtd > 0 && qtd <= maxDisponivel) {
-                return qtd;
-            }
-            System.out.print("Quantidade fora do limite. Digite novamente: ");
-        }
-    }
+    
+	public static int verificaSeIdExiste(int idItem, Scanner sc, int[] idsProdutos, int countId) {
+		
+		while (idItem < 1 || idItem > 5) {
+			System.out.println("\n=====================================\n");
+			System.out.println("Insira um id de um produto existente!");
+			System.out.println("\n=====================================");
+			
+			System.out.print("-> ");
+			idItem = sc.nextInt();
+			
+			for (int j=0; j<idsProdutos.length; j++) {
+				if (idItem == idsProdutos[j]) countId += 1;	
+			}
+		}
+		return idItem;
+	}
+	
+	public static int verificaSeTemOProdutoNoEstoque(int[] idsProdutos, int idItem, int[] estoquesProdutos, Scanner sc) {
+		for (int i=0; i<idsProdutos.length; i++) {
+			if (idsProdutos[idItem-1] == idItem) {
+				while (estoquesProdutos[idItem-1] <= 0) {
+					
+					System.out.println("\n=======================================================\n");
+					System.out.println("ATENÇÃO! O produto escolhido está em falta no estoque :(");
+					System.out.println("\n=======================================================\n");
+						
+					System.out.print("Insira o id de outro produto -> ");
+					idItem = sc.nextInt();
+						
+				}
+			}
+		}
+		
+		return idItem;
+	}
+	
+	public static int velidaçõesDeEntradaDoId(int[] idsProdutos, int idItem, int[] estoquesProdutos, Scanner sc, int countId) {
+		idItem = verificaSeIdExiste(idItem, sc, idsProdutos, countId);
+		idItem = verificaSeTemOProdutoNoEstoque(idsProdutos, idItem, estoquesProdutos, sc);
+		return idItem;
+	}
+	
+	
 
     public static int indiceDoProduto(int[] idsProdutos, int id) {
         for (int i = 0; i < idsProdutos.length; i++) {
@@ -489,7 +536,7 @@ public class MackShop {
         String data = agora.format(fmt);
 
         System.out.println("\n*********************************************************************************************");
-        System.out.println("* MACKSHOP                                                                 *");
+        System.out.printf("* MACKSHOP%90s", "*");
         System.out.println("* CNPJ: 12.345.678/0001-99                                                 *");
         System.out.println("*********************************************************************************************");
         System.out.println("* NOTA FISCAL - VENDA AO CONSUMIDOR                                        *");
