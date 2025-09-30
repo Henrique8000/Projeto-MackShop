@@ -1,3 +1,11 @@
+
+/*
+	Henrique Flávio Guimarães / 10427920
+	Fabrício Nicolini Barros  / 10437001
+	Andreas Caycedo Martinez  / 10435302
+	Rafael Viola  			  / 10737197
+ */
+
 package application;
 
 import java.time.LocalDateTime;
@@ -5,318 +13,334 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Scanner;
 
-public class MackShop {
+public class MackShop2Supremo {
 
-    public static void main(String[] args) {
-        Locale.setDefault(Locale.US);
-        Scanner sc = new Scanner(System.in);
-        
-     // VARIÁVEIS DE CONTROLE
-        boolean menu = true;
-        boolean condBaseIniciada = false;
-
+	public static void main(String[] args) {
+		Locale.setDefault(Locale.US);
+		Scanner sc = new Scanner(System.in);
+		
+		//TODO: Contadores de quantidades
+		
+		// VARIÁVEIS DE CONTROLE
+		boolean menu = true;
+		boolean condBaseIniciada = false;
+		
 		//CATALOGO DE PRODUTOS
-        int[] idsProdutos = new int[]{};
-        String[] nomesProdutos = new String[]{};
-        double[] precosProdutos = new double[]{};
-        int[] estoquesProdutos = new int[]{};   
-        int[] tempEstoquesProdutos = new int[]{};      
-
+		int[] idsProdutos = new int[] {};
+		String[] nomesProdutos = new String[] {};
+		double[] precosProdutos = new double[] {};
+		int[] estoquesProdutos = new int[] {};
+		int[] tempEstoquesProdutos = new int[] {};
+		
 		// VENDA ATUAL
-        int[] vendaAtualIds = null;         
-        int[] vendaAtualQuantidades = null;
-        double totalVendaAtual = 0.0;
-
+		int[] vendaAtualIds = null;
+		int[] vendaAtualQuantidades = null;
+		double totalVendaAtual = 0.0;
+		
 		// HISTÓRICO DE VENDAS
-        int[] historicoIdsPedidos = null;           
-        double[] historicoValoresPedidos = null;     
-        int[][] historicoItensVendidos = null;       
-        int proximoIdPedido = 1000;
+		int[] historicoIdsPedidos = null;
+		double[] historicoValoresPedidos = null;
+		int[][] historicoItensVendidos = null;
+		int idPedidos = 0;
+		int contadorPedidos = 0;
+		
+		showWelcomeMsg();
+		
+		do {
+			
+			mainMenu();
+			
+			String option = sc.nextLine();
+			
+			switch (option) { 
+				case "1":
+					
+					if (condBaseIniciada == false) {	
+						
+						idsProdutos = preencheIdsProdutos(idsProdutos);
+						nomesProdutos = preencheNomesProdutos(nomesProdutos);
+						precosProdutos = preenchePrecosProdutos(precosProdutos);
+						estoquesProdutos = preencheEstoquesProdutos(estoquesProdutos);
+						tempEstoquesProdutos = preencheEstoquesProdutos(tempEstoquesProdutos);
+						
+						vendaAtualIds = iniciaVendaAtualIds();
+						vendaAtualQuantidades = iniciaVendaAtualQuantidades();
+						
+						historicoIdsPedidos = iniciaHistoricoIdsPedidos();
+						historicoValoresPedidos = iniciaHistoricoValoresPedidos();
+						historicoItensVendidos = historicoItensVendidos();
+						
+						condBaseIniciada = true;
+						
+						exibeMsgBaseInicializada();
+						pausaParaRetornarMenu(sc);
+					}
+					else {
+						exibeMsgBaseJaEstaInicializada();
+					}
+					
+					break;
+				
+				case "2":
+					
+					if (condBaseIniciada == true) {
+						exibirCatalogoProdutos(nomesProdutos, estoquesProdutos, tempEstoquesProdutos);
+						pausaParaRetornarMenu(sc);
+						break;
+					}
+					
+					else {
+						exibeMsgBaseNaoInicializada();
+						break;
+					}
+			
+				case "3":
+					
+					if (condBaseIniciada == true) {
+						adicionarItemAVenda(sc, idsProdutos, tempEstoquesProdutos, vendaAtualIds, vendaAtualQuantidades);
+					} else {
+						exibeMsgBaseNaoInicializada();
+						break;
+					}
+					sc.nextLine();
+					pausaParaRetornarMenu(sc);
+					
+					break;
+			
+				case "4":
+					
+					if (condBaseIniciada == true) {
+						totalVendaAtual = verResumoTotalDaVenda(totalVendaAtual, sc, vendaAtualIds, vendaAtualQuantidades, precosProdutos, nomesProdutos);
+					}
+					
+					else {
+						exibeMsgBaseNaoInicializada();
+						break;
+					}
+					break;
+			
+				case "5":
+					
+					if (condBaseIniciada == true) {
+						idPedidos = finalizarVenda(sc, idPedidos, historicoIdsPedidos, historicoValoresPedidos, totalVendaAtual, vendaAtualIds, vendaAtualQuantidades, historicoItensVendidos, estoquesProdutos, tempEstoquesProdutos, idsProdutos, nomesProdutos, precosProdutos, contadorPedidos);
+						contadorPedidos++;
+						totalVendaAtual = 0.0;
+					} else {
+						exibeMsgBaseNaoInicializada();
+						break;
+					}
+					
+					break;
+			
+				case "6":
+					
+					if (condBaseIniciada == true) {
+						verHistoricoVendas(historicoItensVendidos, historicoValoresPedidos, historicoIdsPedidos, contadorPedidos);
 
-        exibirBoasVindas();
+					}
+					
+					else {
+						exibeMsgBaseNaoInicializada();
+						break;
+					}
+					
+					//verificaBaseInicializada(base);
+	
+					break;
+			
+				case "7":
+					
+					if (condBaseIniciada == true) {
+						buscarVendaEspecifica(sc, historicoItensVendidos, idsProdutos, nomesProdutos, precosProdutos, historicoValoresPedidos, historicoIdsPedidos, contadorPedidos);
 
-        do {
-            exibirMenuPrincipal();
-            String opcao = sc.nextLine();
+					}
+					
+					else {
+						exibeMsgBaseNaoInicializada();
+						break;
+					}
+					
+					//verificaBaseInicializada(base);
+					
+					break;
+			
+				case "8":
+					if (condBaseIniciada == true) {
+						reporEstoque(idsProdutos, estoquesProdutos, nomesProdutos, sc);
+					} else {
+						exibeMsgBaseNaoInicializada();
+					}
+					break;
 
-            switch (opcao) {
-                case "1": 
-                    if (condBaseIniciada == false) {
-                    	
-                    	idsProdutos = inicializarIdsProdutos();
-                        nomesProdutos = inicializarNomesProdutos();
-                        precosProdutos = inicializarPrecosProdutos();
-                        estoquesProdutos = inicializarEstoquesProdutos();
-                        tempEstoquesProdutos = inicializarEstoquesProdutos();
+				case "9":
+					if (condBaseIniciada == true) {
+						relatorioEstoqueBaixo(idsProdutos, nomesProdutos, estoquesProdutos, sc, 10);
+					} else {
+						exibeMsgBaseNaoInicializada();
+					}
+					break;
+					
+				case "0":
+					System.out.println("\nFinalizando o programa... Volte sempre!");
+					menu = false;
+					break;
+					
+				
+				default:
+					exibeErroOpInvalid();
+					break;
+				}
+				
+		} while(menu);
+		
+		sc.close();
 
-                        vendaAtualIds = inicializarVetorVendaIds();
-                        vendaAtualQuantidades = inicializarVetorVendaQuantidades();
-
-                        historicoIdsPedidos = inicializarHistoricoIdsPedidos();
-                        historicoValoresPedidos = inicializarHistoricoValoresPedidos();
-                        historicoItensVendidos = inicializarHistoricoItensVendidos();
-
-                        condBaseIniciada = true;
-                        
-                        exibirMensagemBaseInicializada();
-                        pausaParaRetornarMenu(sc);
-                        break;
-                       
-                    } 
-                    else {
-                    	 exibirMensagemBaseJaInicializada();
-                    	 break;
-                    }
-
-                case "2":
-                	
-                    if (condBaseIniciada == true) {
-                    	exibirCatalogoProdutos(nomesProdutos, estoquesProdutos, tempEstoquesProdutos);
-                        pausaParaRetornarMenu(sc);
-                    }
-                    else {
-                    	
-                    	exibeMsgBaseNaoInicializada();
-                        break;
-                    }
-                    
-                    break;
-
-                case "3":
-                    
-                    if (condBaseIniciada == true) {
-                        adicionarItemAVenda(sc, idsProdutos, nomesProdutos, precosProdutos, tempEstoquesProdutos, vendaAtualIds, vendaAtualQuantidades);
-                        pausaParaRetornarMenu(sc);
-                        break;
-                    } 
-                    else {
-                    	exibeMsgBaseNaoInicializada();
-                        break;
-                    }
-                    
-
-                case "4":
-                	
-                    if (condBaseIniciada == true) {
-                        totalVendaAtual = calcularEExibirResumoDaVendaAtual(vendaAtualIds, vendaAtualQuantidades, idsProdutos, nomesProdutos, precosProdutos);
-                        pausaParaRetornarMenu(sc);
-                        break;
-                    } 
-                    else {
-                    	exibeMsgBaseNaoInicializada();
-                        break;
-                    }
-                    
-
-                case "5":
-                	
-                    if (condBaseIniciada == true) {
-                    	
-                        if (vendaVazia(vendaAtualIds)) {
-                            System.out.println("\nNenhum item na venda atual.");
-                            break;
-                        }
-                        
-                        proximoIdPedido = proximoIdPedido + 1;
-                        int idPedidoGerado = proximoIdPedido;
-
-                        totalVendaAtual = calcularEExibirResumoDaVendaAtual(vendaAtualIds, vendaAtualQuantidades, idsProdutos, nomesProdutos, precosProdutos);
-
-                        registrarHistoricoDaVenda(idPedidoGerado, totalVendaAtual, vendaAtualIds, vendaAtualQuantidades, historicoIdsPedidos, historicoValoresPedidos, historicoItensVendidos);
-
-                        copiarConteudo(tempEstoquesProdutos, estoquesProdutos);
-
-                        imprimirNotaFiscal(idPedidoGerado, vendaAtualIds, vendaAtualQuantidades, idsProdutos, nomesProdutos, precosProdutos, totalVendaAtual);
-
-                        limparVendaAtual(vendaAtualIds, vendaAtualQuantidades);
-                        copiarConteudo(estoquesProdutos, tempEstoquesProdutos);
-                        
-                        pausaParaRetornarMenu(sc);
-                        break;
-                    } 
-                    else {
-                    	exibeMsgBaseNaoInicializada();
-
-                        break;
-                    }
-                    
-                case "6":
-                	
-                    if (condBaseIniciada == true) {
-                    	
-                        exibirHistoricoDeVendas(historicoIdsPedidos, historicoValoresPedidos);
-                        pausaParaRetornarMenu(sc);
-                        break;
-                        
-                    } 
-                    else {
-                    	exibeMsgBaseNaoInicializada();
-                        break;
-                    }
-     
-                case "7":
-                    if (condBaseIniciada == true) {
-                        buscarEReimprimirVenda(sc, historicoItensVendidos, historicoIdsPedidos, historicoValoresPedidos, idsProdutos, nomesProdutos, precosProdutos);
-                        pausaParaRetornarMenu(sc);
-                        break;
-                    } 
-                    else {
-                    	exibeMsgBaseNaoInicializada();
-                        break;
-                    }                   
-
-                case "8":                    
-                    if (condBaseIniciada == true) {
-                        reporEstoque(sc, idsProdutos, nomesProdutos, estoquesProdutos);
-                        copiarConteudo(estoquesProdutos, tempEstoquesProdutos);
-                        pausaParaRetornarMenu(sc);
-                        break;
-                    } 
-                    else {
-                    	exibeMsgBaseNaoInicializada();
-                        break;
-                    }
-            
-
-                case "9":                   
-                    if (condBaseIniciada == true) {
-                        emitirRelatorioEstoqueBaixo(idsProdutos, nomesProdutos, estoquesProdutos, 10);
-                        pausaParaRetornarMenu(sc);
-                        break;
-                    } 
-                    else {
-                    	exibeMsgBaseNaoInicializada();
-                        break;
-                    }
-                 
-
-                case "0":
-                    System.out.println("\nFinalizando o programa. Volte sempre!");
-                    menu = false;
-                    break;
-
-                default:
-                    exibirErroOpcaoInvalida();
-            }
-            
-        } while (menu);
-
-        sc.close();
-    }
-
-    
-    
-// ##########################################################################################################################
-// ##########################################################################################################################
-
+	}
+	
 // MENSAGENS DO PROGRAMA
-
-    public static void exibirBoasVindas() {
-        String banner =
-                "~=~=~=~=~=~=~=~=~=~=~=~=~=\n" +
+	public static void showWelcomeMsg() {
+		
+String banner = "~=~=~=~=~=~=~=~=~=~=~=~=~=\n" +
                 "~=~=~=~=~=~=~=~=~=~=~=~=~=\n" +
                 "BEM-VINDO(A) AO MACK SHOP\n" +
                 "~=~=~=~=~=~=~=~=~=~=~=~=~=\n" +
-                "~=~=~=~=~=~=~=~=~=~=~=~=~=\n";
-        System.out.println(banner);
-    }
-
-    public static void exibirMenuPrincipal() {
-        System.out.println("1. Inicializar base");
-        System.out.println("2. Exibir catálogo de produtos");
-        System.out.println("3. Adicionar item à venda");
-        System.out.println("4. Ver resumo da venda atual");
-        System.out.println("5. Finalizar venda (gerar histórico e Nota Fiscal)");
-        System.out.println("6. Ver histórico de vendas");
-        System.out.println("7. Buscar venda específica do histórico");
-        System.out.println("8. (Admin) Repor estoque");
-        System.out.println("9. (Admin) Relatório de estoque baixo");
-        System.out.println("0. Sair");
-        System.out.print("-> ");
-    }
-
-    public static void exibirErroOpcaoInvalida() {
-        System.out.println("\n#########################\n");
-        System.out.println("Insira uma opção válida!");
-        System.out.println("\n#########################\n");
-    }
-
-    public static void exibeMsgBaseNaoInicializada() {
-    	System.out.println("\n######################################################################################");
-    	System.out.println("\nATENÇÃO! Você precisa inicializar a base de produtos para poder usar as outras opções!\n");
-    	System.out.println("######################################################################################\n");
-    }
-
-    public static void exibirMensagemBaseInicializada() {
-        System.out.println("\n######################\n");
-        System.out.println("  BASE INICIALIZADA");
-        System.out.println("\n######################\n");
-    }
-
-    public static void exibirMensagemBaseJaInicializada() {
-        System.out.println("\n#######################################\n");
-        System.out.println("  ATENÇÃO! A BASE JÁ FOI INICIALIZADA");
-        System.out.println("\n#######################################\n");
-    }
-
-    public static void pausaParaRetornarMenu(Scanner sc) {
-        System.out.print("\nDigite algo para voltar ao menu.");
-        sc.nextLine();
-        System.out.println();
-    }
-    
-    public static void exibeAdicionarItemVenda() {
+                "~=~=~=~=~=~=~=~=~=~=~=~=~=\n\n                ";
+		
+		System.out.println(banner);
+		
+	}
+	
+	
+	public static void mainMenu() {
+		
+		System.out.println("1. Inicializar base");
+		System.out.println("2. Exibir catálogo de produtos");
+		System.out.println("3. Adicionar item à venda");
+		System.out.println("4. Ver resumo da venda atual");
+		System.out.println("5. Finalizar venda (gerar histórico e Nota Fiscal)");
+		System.out.println("6. Ver histórico de vendas");
+		System.out.println("7. Buscar venda específica do histórico");
+		System.out.println("8. (Admin) Repor estoque");
+		System.out.println("9. (Admin) Relatório de estoque baixo");
+		System.out.println("0. Sair");
+		System.out.print("-> ");
+		
+	}
+	
+	
+	public static void exibeErroOpInvalid() {
+		System.out.println("\n#########################\n");
+		System.out.println("Insira uma opção válida!");
+		System.out.println("\n#########################\n");
+	}
+	
+	
+	public static void exibeMsgBaseNaoInicializada() {
+		System.out.println("\n######################################################################################");
+		System.out.println("\nATENÇÂO! Você precisa inicializar a base de produtos para poder usar as outras opções!\n");
+		System.out.println("######################################################################################\n");
+	}
+	
+	
+	public static void exibeMsgBaseInicializada() {
+		System.out.println("\n######################\n");
+		System.out.println("  BASE INICIALIZADA");
+		System.out.println("\n######################\n");
+	}
+	
+	
+	public static void exibeMsgBaseJaEstaInicializada() {
+		System.out.println("\n#######################################\n");
+		System.out.println("  ATENÇÃO! A BASE JÁ FOI INICIALIZADA");
+		System.out.println("\n#######################################\n");
+	}
+	
+	
+	public static void pausaParaRetornarMenu(Scanner sc) {
+		System.out.print("\nDigite algo para voltar ao menu...");
+		sc.nextLine();
+		System.out.println();
+	}
+	
+	
+	public static void exibeAdicionarItemVenda() {
 		System.out.println("\n++++++++++++++++++++++\n");
 		System.out.println("ADICIONAR ITEM A VENDA");
 		System.out.println("\n++++++++++++++++++++++\n");
 	}
-    
-// ##########################################################################################################################
-// ##########################################################################################################################
-
- // 1 - FUNÇÕES PARA INICIALIZAR A BASE E VERIFICAR SE A BASE FOI INICIALIZADA
-    
-    public static int[] inicializarIdsProdutos() {
-        return new int[]{1, 2, 3, 4, 5};
-    }
-
-    public static String[] inicializarNomesProdutos() {
-        return new String[]{"Mouse Gamer", "Teclado Mecânico", "Headset 7.1", "Smart Watch", "PlayStation 5"};
-    }
-
-    public static double[] inicializarPrecosProdutos() {
-        return new double[]{150.00, 350.00, 420.50, 1200.00, 3700.00};
-    }
-
-    public static int[] inicializarEstoquesProdutos() {
-        return new int[]{8, 12, 5, 15, 7};
-    }
-
-    public static int[] inicializarVetorVendaIds() {
-        return new int[100]; // capacidade razoável sem vetor dinâmico
-    }
-
-    public static int[] inicializarVetorVendaQuantidades() {
-        return new int[100];
-    }
-
-    public static int[] inicializarHistoricoIdsPedidos() {
-        return new int[100];
-    }
-
-    public static double[] inicializarHistoricoValoresPedidos() {
-        return new double[100];
-    }
-
-    public static int[][] inicializarHistoricoItensVendidos() {
-        return new int[1000][3]; // até 1000 linhas de itens vendidos
-    }
-
-// ##########################################################################################################################
+	
 // ##########################################################################################################################
 
+
+// 1 - FUNÇÕES PARA INICIALIZAR A BASE E VERIFICAR SE A BASE FOI INICIALIZADA
+	
+	public static boolean verificaBaseInicializada(boolean base) {
+		if (!base) {
+			return base;
+		}
+		else {
+			exibeMsgBaseNaoInicializada();
+			return base;
+		}
+	}
+	
+	
+	public static int[] preencheIdsProdutos(int[] idsProdutos) {
+		return idsProdutos = new int[] {1, 2, 3, 4, 5};
+		}
+	
+	
+	public static String[] preencheNomesProdutos(String[] nomesProdutos) {
+		return nomesProdutos = new String[] {"IPhone 17", "JBL Charge 5", "TV", "Smart Watch", "PlayStation 5"};
+	}
+	
+	
+	public static double[] preenchePrecosProdutos(double[] precosProdutos) {
+		return precosProdutos = new double[] {8000.00, 900.00, 1000.00, 1200.00, 3700.00};
+	}
+	
+	
+	public static int[] preencheEstoquesProdutos(int[] estoquesProdutos) {
+		return estoquesProdutos = new int[] {1, 5, 10, 15, 8};
+	}
+	
+	
+	public static int[] iniciaVendaAtualIds() {
+		int[] vendaAtualIds;
+		return vendaAtualIds = new int[30];
+	}
+	
+	
+	public static int[] iniciaVendaAtualQuantidades() {
+		int[] vendaAtualQuantidades;
+		return vendaAtualQuantidades = new int[30];
+	}
+	
+	
+	public static int[] iniciaHistoricoIdsPedidos() {
+		int[] historicoIdsPedidos;
+		return historicoIdsPedidos = new int[1000]; // Aumentado para 1000 pedidos
+	}
+	
+	
+	public static double[] iniciaHistoricoValoresPedidos() {
+		double[] historicoValoresPedidos;
+		return historicoValoresPedidos = new double[1000]; // Aumentado para 1000 pedidos
+	}
+	
+	
+	public static int[][] historicoItensVendidos() {
+		int[][] historicoItensVendidos;
+		return historicoItensVendidos = new int[1000][3]; // Aumentado para 1000 itens para acomodar mais vendas
+	}
+	
+
+// ##########################################################################################################################
+// ##########################################################################################################################
+	
 // 2 - FUNÇÃO PARA EXIBIR CATÁLOGO DE PRODUTOS
-    public static void exibirCatalogoProdutos(String[] nomesProdutos, int[] estoquesProdutos, int[] tempEstoquesProdutos) {
+
+	public static void exibirCatalogoProdutos(String[] nomesProdutos, int[] estoquesProdutos, int[] tempEstoquesProdutos) {
 	    int n = nomesProdutos.length;
 	    int[] indice = new int[n];
 	    int k = 0;
@@ -353,28 +377,23 @@ public class MackShop {
 	    }
 	    System.out.println("================================================================\n");
 	}
-
-    
+	
 // ##########################################################################################################################
 // ##########################################################################################################################
-    
+	
 // 3 - FUNÇÕES PARA ADICIONAR ITEM À VENDA
-    
-    public static void adicionarItemAVenda(Scanner sc, int[] idsProdutos, String[] nomesProdutos, double[] precosProdutos, int[] tempEstoquesProdutos, int[] vendaAtualIds, int[] vendaAtualQuantidades) {
-        
-    	exibeAdicionarItemVenda();
 
-    	System.out.print("Digite o ID do item que vc deseja comprar: ");
-		int countId = 0;
+	public static void adicionarItemAVenda(Scanner sc, int[] idsProdutos, int[] tempEstoquesProdutos, int[] vendaAtualIds, int[] vendaAtualQuantidades) {
+		exibeAdicionarItemVenda();
 		
+		System.out.print("Digite o ID do item que vc deseja comprar: ");
 		int idItem = sc.nextInt();
 		
-		idItem = velidaçõesDeEntradaDoId(idsProdutos, idItem, tempEstoquesProdutos, sc, countId);
+		idItem = velidaçõesDeEntradaDoId(idsProdutos, idItem, tempEstoquesProdutos, sc);
 		
 		System.out.print("\nQuantos vc quer levar? ");
 		int qtdItens = sc.nextInt();
 		
-		//TODO: Validação se a quantidade que o cliente quer levar condiz com oq tem em estoque
 		while (qtdItens > tempEstoquesProdutos[idItem - 1] || qtdItens <= 0) {
 			
 			System.out.println("\n=============================\n");
@@ -392,327 +411,291 @@ public class MackShop {
 				vendaAtualQuantidades[i] = qtdItens;
 				tempEstoquesProdutos[i] -= qtdItens;
 			}						
-		}
-    }
-    
-	public static int verificaSeIdExiste(int idItem, Scanner sc, int[] idsProdutos, int countId) {
-		
-		while (idItem < 1 || idItem > 5) {
-			System.out.println("\n=====================================\n");
-			System.out.println("Insira um id de um produto existente!");
-			System.out.println("\n=====================================");
-			
-			System.out.print("-> ");
-			idItem = sc.nextInt();
-			
-			for (int j=0; j<idsProdutos.length; j++) {
-				if (idItem == idsProdutos[j]) countId += 1;	
-			}
-		}
-		return idItem;
+		}	
 	}
 	
-	public static int verificaSeTemOProdutoNoEstoque(int[] idsProdutos, int idItem, int[] estoquesProdutos, Scanner sc) {
-		for (int i=0; i<idsProdutos.length; i++) {
-			if (idsProdutos[idItem-1] == idItem) {
-				while (estoquesProdutos[idItem-1] <= 0) {
-					
-					System.out.println("\n=======================================================\n");
-					System.out.println("ATENÇÃO! O produto escolhido está em falta no estoque :(");
-					System.out.println("\n=======================================================\n");
-						
-					System.out.print("Insira o id de outro produto -> ");
-					idItem = sc.nextInt();
-						
-				}
-			}
-		}
-		
-		return idItem;
+	public static int velidaçõesDeEntradaDoId(int[] idsProdutos, int idItem, int[] estoquesProdutos, Scanner sc) {
+	    int produtoIndex = -1;
+	    boolean idValido = false;
+	    while (!idValido) {
+	        // Verifica se o ID está dentro do range válido
+	        if (idItem > 0 && idItem <= idsProdutos.length) {
+	            produtoIndex = idItem - 1; // Ajusta para índice base 0
+	            // Verifica se o produto tem estoque
+	            if (estoquesProdutos[produtoIndex] > 0) {
+	                idValido = true;
+	            } else {
+	                System.out.println("\n=======================================================\n");
+	                System.out.println("ATENÇÃO! O produto escolhido está em falta no estoque :(");
+	                System.out.println("\n=======================================================\n");
+	                System.out.print("Insira o ID de outro produto -> ");
+	                idItem = sc.nextInt();
+	            }
+	        } else {
+	            System.out.println("\n=====================================\n");
+	            System.out.println("Insira um ID de produto existente (entre 1 e " + idsProdutos.length + ")!");
+	            System.out.println("\n=====================================");
+	            System.out.print("-> ");
+	            idItem = sc.nextInt();
+	        }
+	    }
+	    return idItem;
 	}
 	
-	public static int velidaçõesDeEntradaDoId(int[] idsProdutos, int idItem, int[] estoquesProdutos, Scanner sc, int countId) {
-		idItem = verificaSeIdExiste(idItem, sc, idsProdutos, countId);
-		idItem = verificaSeTemOProdutoNoEstoque(idsProdutos, idItem, estoquesProdutos, sc);
-		return idItem;
-	}
-	
-	
-
-    public static int indiceDoProduto(int[] idsProdutos, int id) {
-        for (int i = 0; i < idsProdutos.length; i++) {
-            if (idsProdutos[i] == id) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-
-
 // ##########################################################################################################################
 // ##########################################################################################################################
 
 // 4 - FUNÇÃO PARA VER RESUMO TOTAL DA VENDA
+	
+	public static double verResumoTotalDaVenda(double totalVendaAtual,Scanner sc, int[] vendaAtualIds, int[] vendaAtualQuantidades, double[] precosProdutos, String[] nomesProdutos) {
+		totalVendaAtual = 0.0;
+		double subtotal = 0.0;
+		System.out.println("\nRESUMO DA VENDA ATUAL\n");
+		
+		System.out.println("ITENS:");
+		
+		
+		for (int i=0; i<vendaAtualIds.length; i++) {
+			subtotal = 0.0;
+			if (vendaAtualIds[i] != 0) {
+				subtotal += vendaAtualQuantidades[i] * precosProdutos[i]; 
+				System.out.printf("%s -> subtotal: R$%.2f%n", nomesProdutos[i], subtotal);	
+			}
+			
+			totalVendaAtual += subtotal;
+		}
+		
+		System.out.printf("%nTotal da venda atual: R$%.2f%n", totalVendaAtual);
+		
+		System.out.println("===============================");
+		
+		pausaParaRetornarMenu(sc);
+		
+		return totalVendaAtual;
+		
+	}
 
-    public static boolean vendaVazia(int[] vendaAtualIds) {
-        for (int v : vendaAtualIds) {
-            if (v != 0) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public static double calcularEExibirResumoDaVendaAtual(int[] vendaAtualIds, int[] vendaAtualQuantidades, int[] idsProdutos, String[] nomesProdutos, double[] precosProdutos) {
-        
-    	double total = 0.0;
-        System.out.println("\nRESUMO DA VENDA ATUAL\n");
-        System.out.println("* # | ID   | DESCRIÇÃO                 | QTD | VL. UNIT. | VL. TOTAL");
-        System.out.println("-------------------------------------------------------------------");
-        int contador = 1;
-        
-        for (int i = 0; i < vendaAtualIds.length && i < idsProdutos.length; i++) {
-            if (vendaAtualIds[i] != 0) {
-                double vlItem = precosProdutos[i] * vendaAtualQuantidades[i];
-                total = total + vlItem;
-                System.out.printf("* %d | %-4d | %-24s | %3d | R$ %8.2f | R$ %8.2f%n",contador, vendaAtualIds[i], nomesProdutos[i], vendaAtualQuantidades[i], precosProdutos[i], vlItem);
-                contador = contador + 1;
-            }
-        }
-        
-        System.out.println("-------------------------------------------------------------------");
-        System.out.printf("Subtotal/Total: R$ %.2f%n", total);
-        return total;
-    }
-
-    
+	
 // ##########################################################################################################################
 // ##########################################################################################################################
-    
+	
 // 5 - FUNÇÕES PARA FINALIZAR VENDA
-    
-    public static void registrarHistoricoDaVenda(int idPedido, double totalVenda, int[] vendaAtualIds, int[] vendaAtualQuantidades, int[] historicoIdsPedidos, double[] historicoValoresPedidos, int[][] historicoItensVendidos) {
-        int posCabecalho = primeiraPosicaoLivre(historicoIdsPedidos);
-        
-        if (posCabecalho != -1) {
-            historicoIdsPedidos[posCabecalho] = idPedido;
-            historicoValoresPedidos[posCabecalho] = totalVenda;
-        }
+	
+	public static void imprimirNotaFiscal(int pedidoId, double valorTotalPedido, int[] idsProdutosBase, String[] nomesProdutosBase, double[] precosProdutosBase, int[] itensVendaIds, int[] itensVendaQuantidades, Scanner sc) {
+	    LocalDateTime agora = LocalDateTime.now();
+	    DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+	    String dataEmissao = agora.format(formatador);
+	
+	    System.out.println("\n*********************************************************************************************");
+	    System.out.println("*                                MACKSHOP                                   *");
+	    System.out.println("* CNPJ: 12.345.678/0001-99                                                  *");
+	    System.out.println("*********************************************************************************************");
+	    System.out.println("* NOTA FISCAL - VENDA AO CONSUMIDOR                                         *");
+	    System.out.printf("* Pedido ID: %-8d                                                               *\n", pedidoId);
+	    System.out.printf("* Data de Emissão: %-19s                                                         *\n", dataEmissao);
+	    System.out.println("*********************************************************************************************");
+	    System.out.println("* # | ID  | DESCRIÇÃO                    | QTD | VL. UNIT. | VL. TOTAL *");
+	    System.out.println("-----------------------------------------------------------------------------------------------------------");
+	
+	    double subtotalNota = 0.0;
+	    int contadorItens = 0;
+	    for (int i = 0; i < itensVendaIds.length; i++) {
+	        if (itensVendaIds[i] != 0) {
+	            int idProduto = itensVendaIds[i];
+	            int quantidade = itensVendaQuantidades[i];
+	            String nomeProduto = "";
+	            double precoUnitario = 0.0;
+	            int indexProdutoBase = -1;
 
-        for (int i = 0; i < vendaAtualIds.length; i++) {
-            if (vendaAtualIds[i] != 0 && vendaAtualQuantidades[i] > 0) {
-                int linha = primeiraLinhaLivre(historicoItensVendidos);
-                if (linha != -1) {
-                    historicoItensVendidos[linha][0] = idPedido;
-                    historicoItensVendidos[linha][1] = vendaAtualIds[i];
-                    historicoItensVendidos[linha][2] = vendaAtualQuantidades[i];
-                }
-            }
-        }
-    }
+	            for (int j = 0; j < idsProdutosBase.length; j++) {
+	                if (idsProdutosBase[j] == idProduto) {
+	                    indexProdutoBase = j;
+	                    nomeProduto = nomesProdutosBase[j];
+	                    precoUnitario = precosProdutosBase[j];
+	                    break;
+	                }
+	            }
 
-    public static int primeiraPosicaoLivre(int[] vetor) {
-        for (int i = 0; i < vetor.length; i++) {
-            if (vetor[i] == 0) {
-                return i;
-            }
-        }
-        return -1;
-    }
+	            if (indexProdutoBase != -1) {
+	                double valorTotalItem = quantidade * precoUnitario;
+	                subtotalNota += valorTotalItem;
+	                contadorItens++;
+	                System.out.printf("* %-2d| %-3d | %-26s | %-3d | R$ %-7.2f | R$ %-8.2f *\n",
+	                                  contadorItens, idProduto, nomeProduto, quantidade, precoUnitario, valorTotalItem);
+	            }
+	        }
+	    }
+	
+	    System.out.println("-----------------------------------------------------------------------------------------------------------");
+	    System.out.printf("* VALOR TOTAL: R$ %-8.2f                                                              *\n", valorTotalPedido);
+	    System.out.println("*********************************************************************************************\n");
+	
+	    pausaParaRetornarMenu(sc);
+	}
 
-    public static int primeiraLinhaLivre(int[][] matriz) {
-        for (int i = 0; i < matriz.length; i++) {
-            if (matriz[i][0] == 0) {
-                return i;
-            }
-        }
-        return -1;
-    }
+	public static int finalizarVenda(Scanner sc, int idPedidos, int[] historicoIdsPedidos, double[] historicoValoresPedidos, double totalVendaAtual, int[] vendaAtualIds, int[] vendaAtualQuantidades, int[][] historicoItensVendidos, int[] estoquesProdutos, int[] tempEstoquesProdutos, int[] idsProdutos, String[] nomesProdutos, double[] precosProdutos, int contadorPedidos) {
+		idPedidos += 1;
+		historicoIdsPedidos[idPedidos-1] = idPedidos;
+		historicoValoresPedidos[idPedidos-1] = totalVendaAtual;
+		
+		int qtdItensVendidos = 0;
+		
+		for (int i=0; i<vendaAtualIds.length; i++) 
+			if (vendaAtualIds[i] != 0) qtdItensVendidos += 1; 	
+		
+		int historicoItemIndex = 0;
+		for (int i = 0; i < vendaAtualIds.length; i++) {
+			if (vendaAtualIds[i] != 0) {
+				historicoItensVendidos[historicoItemIndex][0] = idPedidos;
+				historicoItensVendidos[historicoItemIndex][1] = vendaAtualIds[i];
+				historicoItensVendidos[historicoItemIndex][2] = vendaAtualQuantidades[i];
+				historicoItemIndex++;
+			}
+		}
+		
+		for (int i = 0; i < estoquesProdutos.length; i++) {
+			estoquesProdutos[i] = tempEstoquesProdutos[i];
+		}
+		
+		int[] itensParaNotaIds = new int[vendaAtualIds.length];
+		int[] itensParaNotaQuantidades = new int[vendaAtualQuantidades.length];
+		System.arraycopy(vendaAtualIds, 0, itensParaNotaIds, 0, vendaAtualIds.length);
+		System.arraycopy(vendaAtualQuantidades, 0, itensParaNotaQuantidades, 0, vendaAtualQuantidades.length);
+		double valorTotalParaNota = totalVendaAtual;
 
-    public static void imprimirNotaFiscal(int idPedido, int[] vendaIds, int[] vendaQtde, int[] idsProdutos, String[] nomesProdutos, double[] precosProdutos,double total) {
-        LocalDateTime agora = LocalDateTime.now();
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-        String data = agora.format(fmt);
-
-        System.out.println("\n*********************************************************************************************");
-        System.out.printf("* MACKSHOP%90s", "*");
-        System.out.println("* CNPJ: 12.345.678/0001-99                                                 *");
-        System.out.println("*********************************************************************************************");
-        System.out.println("* NOTA FISCAL - VENDA AO CONSUMIDOR                                        *");
-        System.out.printf("* Pedido ID: %-6d                                                           *%n", idPedido);
-        System.out.printf("* Data de Emissão: %-19s                                        *%n", data);
-        System.out.println("*********************************************************************************************");
-        System.out.println("* # | ID   | DESCRIÇÃO                 | QTD | VL. UNIT.   | VL. TOTAL     *");
-        System.out.println("-----------------------------------------------------------------------------------------------------------");
-
-        int contador = 1;
-        double subtotal = 0.0;
-        
-        for (int i = 0; i < vendaIds.length && i < idsProdutos.length; i++) {
-            if (vendaIds[i] != 0) {
-                double vlUnit = precosProdutos[i];
-                double vlTot = vlUnit * vendaQtde[i];
-                subtotal = subtotal + vlTot;
-                
-                System.out.printf("* %-1d | %-4d | %-23s | %3d | R$ %9.2f | R$ %10.2f *%n", contador, vendaIds[i], nomesProdutos[i], vendaQtde[i], vlUnit, vlTot);
-                contador = contador + 1;
-            }
-        }
-        
-        System.out.println("-----------------------------------------------------------------------------------------------------------");
-        System.out.printf("* %-18s | R$ %10.2f   *%n", "SUBTOTAL", subtotal);
-        System.out.printf("* %-18s | R$ %10.2f   *%n", "TOTAL", total);
-        System.out.println("*********************************************************************************************");
-        System.out.println("* OBRIGADO PELA PREFERÊNCIA! VOLTE SEMPRE!                                *");
-        System.out.println("*********************************************************************************************\n");
-    }
-
-    public static void limparVendaAtual(int[] vendaIds, int[] vendaQtde) {
-        for (int i = 0; i < vendaIds.length; i++) {
-            vendaIds[i] = 0;
-            vendaQtde[i] = 0;
-        }
-    }
-
-    
+		imprimirNotaFiscal(idPedidos, valorTotalParaNota, idsProdutos, nomesProdutos, precosProdutos, itensParaNotaIds, itensParaNotaQuantidades, sc);
+		
+		// Limpa os vetores da venda atual
+		for (int i = 0; i < vendaAtualIds.length; i++) {
+			vendaAtualIds[i] = 0;
+			vendaAtualQuantidades[i] = 0;
+		}
+		
+		return idPedidos;
+	}
+	
 // ##########################################################################################################################
 // ##########################################################################################################################
 
- // 6 - FUNÇÃO DE VER HISTORICO DE VENDAS
-    
-    
-    public static void exibirHistoricoDeVendas(int[] historicoIdsPedidos, double[] historicoValoresPedidos) {
-        System.out.println("\nHISTÓRICO DE VENDAS\n");
-        boolean vazio = true;
-        
-        for (int i = 0; i < historicoIdsPedidos.length; i++) {
-            if (historicoIdsPedidos[i] != 0) {
-                vazio = false;
-                System.out.printf("Pedido ID: %d - Valor Total: R$ %.2f%n", historicoIdsPedidos[i], historicoValoresPedidos[i]);
-            }
-        }
-        if (vazio) {
-            System.out.println("(vazio)");
-        }
-    }
-    
+// 6 - FUNÇÕES PARA VER HISTÓRICO DE VENDAS
 
-// ##########################################################################################################################
-// ##########################################################################################################################
-    
-// 7 - FUNCÕES PARA BUSCAR VENDA ESPECÍFICA DO HISTÓRICO
+	public static void verHistoricoVendas(int[][] historicoItensVendidos, double[] historicoValoresPedidos, int[] historicoIdsPedidos, int contadorPedidos) {
+	    System.out.println("\n========== HISTÓRICO DE VENDAS ==========");
+	    if (contadorPedidos == 0) {
+	      System.out.println("(nenhuma venda registrada)");
+	    } else {
+	        System.out.printf("%-10s | %-15s%n", "ID Pedido", "Valor Total");
+	        System.out.println("---------------------------------");
+	        for (int i = 0; i < contadorPedidos; i++) {
+	            System.out.printf("%-10d | R$ %-15.2f%n", historicoIdsPedidos[i], historicoValoresPedidos[i]);
+	        }
+	    }
+	    System.out.println("======================================\n");
+	}
 
-    
-    public static void buscarEReimprimirVenda(Scanner sc, int[][] historicoItensVendidos, int[] historicoIdsPedidos, double[] historicoValoresPedidos, int[] idsProdutos, String[] nomesProdutos, double[] precosProdutos) {
-        System.out.print("\nDigite o ID do pedido que deseja buscar: ");
-        int id = sc.nextInt();
-        sc.nextLine();
-
-        int indiceCabecalho = -1;
-        
-        for (int i = 0; i < historicoIdsPedidos.length; i++) {
-            if (historicoIdsPedidos[i] == id) {
-                indiceCabecalho = i;
-                break;
-            }
-        }
-        
-        if (indiceCabecalho == -1) {
-            System.out.println("\nPedido não encontrado no histórico!");
-            return;
-        }
-        
-        double total = historicoValoresPedidos[indiceCabecalho];
-
-        int itensDoPedido = 0;
-        for (int[] linha : historicoItensVendidos) {
-            if (linha[0] == id) {
-                itensDoPedido = itensDoPedido + 1;
-            }
-        }
-        
-        if (itensDoPedido == 0) {
-            System.out.println("\nNenhum item registrado para este pedido!");
-            return;
-        }
-
-        int[] vendaIds = new int[idsProdutos.length];
-        int[] vendaQtd = new int[idsProdutos.length];
-        
-        for (int[] linha : historicoItensVendidos) {
-        	
-            if (linha[0] == id) {
-                int idProd = linha[1];
-                int qt = linha[2];
-                int indice = indiceDoProduto(idsProdutos, idProd);
-                if (indice != -1) {
-                    vendaIds[indice] = idProd;
-                    vendaQtd[indice] = qt;
-                }
-            }
-        }
-        
-        imprimirNotaFiscal(id, vendaIds, vendaQtd, idsProdutos, nomesProdutos, precosProdutos, total);
-    }
-
-    
+	
 // ##########################################################################################################################
 // ##########################################################################################################################
 
-// 8 - FUNÇÕES REPOR ESTOQUE
-    
-    public static void reporEstoque(Scanner sc, int[] idsProdutos, String[] nomesProdutos, int[] estoquesProdutos) {
-        System.out.print("\nID do produto para repor: ");
-        int id = lerIdValido(sc, idsProdutos);
-        int idx = indiceDoProduto(idsProdutos, id);
-        System.out.printf("Produto: %s | Qtd. atual: %d%n", nomesProdutos[idx], estoquesProdutos[idx]);
-        System.out.print("Repor quantas unidades? ");
-        int qtd = lerQuantidadePositiva(sc);
-        estoquesProdutos[idx] = estoquesProdutos[idx] + qtd;
-        System.out.printf("Produto %d atualizado! Agora tem %d unidades.%n", id, estoquesProdutos[idx]);
-    }
+// 7 - FUNÇÕES PARA BUSCAR VENDA ESPECÍFICA
 
-    public static int lerQuantidadePositiva(Scanner sc) {
-        while (true) {
-            int qtd = sc.nextInt();
-            sc.nextLine();
-            if (qtd > 0) {
-                return qtd;
-            }
-            System.out.print("A quantidade deve ser > 0. Digite de novo: ");
-        }
-    }
-    
-    
+	public static void buscarVendaEspecifica(Scanner sc, int[][] historicoItensVendidos, int[] idsProdutos, String[] nomesProdutos, double[] precosProdutos, double[] historicoValoresPedidos, int[] historicoIdsPedidos, int contadorPedidos) {
+	    System.out.print("Digite o ID do pedido que deseja buscar: ");
+	    int idBusca = sc.nextInt();
+	    sc.nextLine(); // Limpar o buffer
+
+	    int pedidoIndex = -1;
+	    for (int i = 0; i < contadorPedidos; i++) {
+	        if (historicoIdsPedidos[i] == idBusca) {
+	            pedidoIndex = i;
+	            break;
+	        }
+	    }
+
+	    if (pedidoIndex != -1) {
+	        System.out.printf("\nDETALHES DO PEDIDO %d%n", idBusca);
+	        System.out.println("---------------------------------");
+	        System.out.printf("Valor Total: R$ %.2f%n", historicoValoresPedidos[pedidoIndex]);
+	        System.out.println("Itens:");
+
+	        for (int i = 0; i < historicoItensVendidos.length; i++) {
+	            if (historicoItensVendidos[i][0] == idBusca) {
+	                int idProduto = historicoItensVendidos[i][1];
+	                int quantidade = historicoItensVendidos[i][2];
+	                String nomeProduto = "";
+	                double precoUnitario = 0.0;
+
+	                for (int j = 0; j < idsProdutos.length; j++) {
+	                    if (idsProdutos[j] == idProduto) {
+	                        nomeProduto = nomesProdutos[j];
+	                        precoUnitario = precosProdutos[j];
+	                        break;
+	                    }
+	                }
+	                System.out.printf("- %s (Qtd: %d) - Subtotal: R$ %.2f%n", nomeProduto, quantidade, (quantidade * precoUnitario));
+	            }
+	        }
+	    } else {
+	        System.out.println("\nPedido não encontrado!\n");
+	    }
+	}
+
+	
 // ##########################################################################################################################
 // ##########################################################################################################################
 
-// 9 - FUNÇÕES DE RELATÓRIO DE ESTOQUE BAIXO
-    
-    public static void emitirRelatorioEstoqueBaixo(int[] idsProdutos, String[] nomesProdutos, int[] estoquesProdutos, int minimo) {
-        System.out.printf("\nRELATÓRIO DE ESTOQUE BAIXO\n");
-        
-        boolean encontrou = false;
-        for (int i = 0; i < idsProdutos.length; i++) {
-            if (estoquesProdutos[i] < minimo) {
-                encontrou = true;
-                System.out.printf("ID %-4d | %-24s | Qtd.: %d%n", idsProdutos[i], nomesProdutos[i], estoquesProdutos[i]);
-            }
-        }
-        if (!encontrou) {
-            System.out.println("Nenhum produto abaixo do limiar.");
-        }
-    }
+// 8 - FUNÇÕES PARA REPOR ESTOQUE
 
+	public static void reporEstoque(int[] idsProdutos, int[] estoquesProdutos, String[] nomesProdutos, Scanner sc) {
+	    System.out.print("Digite o ID do produto para repor o estoque: ");
+	    int idProduto = sc.nextInt();
+	    sc.nextLine(); // Limpar o buffer
+
+	    int produtoIndex = -1;
+	    for (int i = 0; i < idsProdutos.length; i++) {
+	        if (idsProdutos[i] == idProduto) {
+	            produtoIndex = i;
+	            break;
+	        }
+	    }
+
+	    if (produtoIndex != -1) {
+	        System.out.printf("Estoque atual de %s: %d%n", nomesProdutos[produtoIndex], estoquesProdutos[produtoIndex]);
+	        System.out.print("Digite a quantidade a ser adicionada: ");
+	        int quantidade = sc.nextInt();
+	        sc.nextLine(); // Limpar o buffer
+
+	        if (quantidade > 0) {
+	            estoquesProdutos[produtoIndex] += quantidade;
+	            System.out.printf("Novo estoque de %s: %d%n", nomesProdutos[produtoIndex], estoquesProdutos[produtoIndex]);
+	        } else {
+	            System.out.println("Quantidade inválida!");
+	        }
+	    } else {
+	        System.out.println("Produto não encontrado!");
+	    }
+	}
+
+	
 // ##########################################################################################################################
 // ##########################################################################################################################
 
-// VETOR UTILS
-    
-    public static void copiarConteudo(int[] origem, int[] destino) {
-        for (int i = 0; i < origem.length && i < destino.length; i++) {
-            destino[i] = origem[i];
-        }
-    }
+// 9 - FUNÇÕES PARA RELATÓRIO DE ESTOQUE BAIXO
+
+	public static void relatorioEstoqueBaixo(int[] idsProdutos, String[] nomesProdutos, int[] estoquesProdutos, Scanner sc, int limite) {
+	    System.out.printf("\nRELATÓRIO DE ESTOQUE BAIXO (limite: %d)%n", limite);
+	    System.out.println("---------------------------------");
+	    boolean encontrou = false;
+	    for (int i = 0; i < idsProdutos.length; i++) {
+	        if (estoquesProdutos[i] < limite) {
+	            System.out.printf("- %s (ID: %d) - Estoque: %d%n", nomesProdutos[i], idsProdutos[i], estoquesProdutos[i]);
+	            encontrou = true;
+	        }
+	    }
+	    if (!encontrou) {
+	        System.out.println("(nenhum produto com estoque baixo)");
+	    }
+	    System.out.println();
+	}
 }
+
