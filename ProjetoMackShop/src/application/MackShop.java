@@ -277,7 +277,7 @@ public class MackShop {
  // 1 - FUNÇÕES PARA INICIALIZAR A BASE E VERIFICAR SE A BASE FOI INICIALIZADA
     
     public static int[] inicializarIdsProdutos() {
-        return new int[]{101, 203, 401, 555, 777};
+        return new int[]{1, 2, 3, 4, 5};
     }
 
     public static String[] inicializarNomesProdutos() {
@@ -716,4 +716,3 @@ public class MackShop {
         }
     }
 }
-
